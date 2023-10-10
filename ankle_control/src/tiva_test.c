@@ -12,6 +12,13 @@ int main(void)
 {
     tiva_setup();
     led_setup();
-    led_set(LED_COLOR_GREEN);
+    dummy_func();
+    for(;;)
+    {
+        led_set(LED_COLOR_GREEN);
+        time_delay_ms(1000);
+        led_set(LED_COLOR_BLUE);
+        time_delay_ms(1000);
+    }
     return 0;
 }
