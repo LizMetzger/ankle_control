@@ -7,15 +7,6 @@ cmakeme_defaults(RelWithDebInfo)
 find_package(TivaCMake REQUIRED)
 
 add_library(ankle_control INTERFACE)
-# # add all the .c files: src/${file_name}.c
-# add_library(ankle_control
-#     src/controller.c
-#     src/encoder.c
-#     src/force_sensor.c
-#     src/servo.c
-# )
-
-# # add_library(ankle_control_src INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 target_include_directories(ankle_control INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -57,16 +48,3 @@ cmakeme_install(TARGETS ankle_control_tiva
 
 add_executable(tiva_test src/tiva_test.c)
 target_link_libraries(tiva_test nuhal::nuhal ankle_control_tiva)
-
-  # target_include_directories(ankle_control INTERFACE
-  # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-  # )
-# # target_link_libraries(ankle_control ankle_control_src nuhal)# cmakeme_flags TivaCMake::driverlib m)
-#   # PRIVATE nuhal cmakeme_flags 
-#   # PUBLIC nuhal TivaCMake::driverlib m)
-
-# cmakeme_install(TARGETS ankle_control driverlib NAMESPACE ankle_control DEPENDS nuhal TivaCMake) 
-
-# # # Enable some integration tests. These are not automated because they require a microcontroller to be plugged in
-# add_executable(tiva_test src/tiva_test.c)
-# target_link_libraries(tiva_test nuhal cmakeme_flags) 
