@@ -286,7 +286,7 @@ int main()
             }
 
             printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal_pose), convert::tics2deg(dxl_present_position));
-        } while(dxl_present_position != goal);
+        } while(dxl_present_position + 3 <= goal or dxl_present_position - 3 >= goal);
     }
 
   // Disable Dynamixel Torque
