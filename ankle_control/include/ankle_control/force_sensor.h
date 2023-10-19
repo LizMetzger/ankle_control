@@ -1,5 +1,11 @@
 #ifndef PROSTHETIC_ANKLE_H
 #define PROSTHETIC_ANKLE_H
-void dummy_func1();
+
+#include<stdint.h>
+#include<stdbool.h> 
+
+void adc_enable(void);
+
+uint32_t adc_read(void);
 
 #endif

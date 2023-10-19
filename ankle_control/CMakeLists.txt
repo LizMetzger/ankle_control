@@ -48,3 +48,6 @@ cmakeme_install(TARGETS ankle_control_tiva
 
 add_executable(tiva_test src/tiva_test.c)
 target_link_libraries(tiva_test nuhal::nuhal ankle_control_tiva)
+
+add_executable(controller src/controller.c)
+target_link_libraries(controller nuhal::nuhal ankle_control_tiva)

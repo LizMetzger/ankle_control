@@ -18,8 +18,11 @@
 #define ADDR_TORQUE_ENABLE          64
 #define ADDR_GOAL_POSITION          116
 #define ADDR_PRESENT_POSITION       132
-#define MINIMUM_POSITION_LIMIT      -1000  // Refer to the Minimum Position Limit of product eManual
-#define MAXIMUM_POSITION_LIMIT      4095  // Refer to the Maximum Position Limit of product eManual
+#define OPERATING_MODE              11
+#define EXTENDED_POSITION           4
+// #define MINIMUM_POSITION_LIMIT      -4095  // Refer to the Minimum Position Limit of product eManual
+// #define MAXIMUM_POSITION_LIMIT      4095  // Refer to the Maximum Position Limit of product eManual
+#define MAX_POSITION_VALUE              1048575
 #define BAUDRATE                    57600
 #define ADDE_PRESENT_CURRENT        126
 
@@ -29,8 +32,9 @@
 
 #define TORQUE_ENABLE                   1
 #define TORQUE_DISABLE                  0
-#define DXL_MOVING_STATUS_THRESHOLD     50  // DYNAMIXEL moving status threshold
+#define DXL_MOVING_STATUS_THRESHOLD     20  // DYNAMIXEL moving status threshold
 #define ESC_ASCII_VALUE                 0x1b
+#define SPACE_ASCII_VALUE               0x20
 
 #define NUMB_OF_DYNAMIXELS              1
 
@@ -44,8 +48,8 @@ std::vector<float> servo_positions(4);
 // Map for movement keys
 std::map<char, std::vector<float>> moveBindings
 {
-  {'w', {1}},
-//   {'a', {-1}},
+//   {'w', {1}},
+  {'a', {-1}},
 //   {'s', {-1}},
   {'d', {1}},
 //   {'i', {-1}},
@@ -57,8 +61,8 @@ std::map<char, std::vector<float>> moveBindings
 // Map for servo controls, position of servo in servo_positions vector (add 1 for the actual servo id)
 std::map<char, std::vector<float>> servoBindings
 {
-  {'w', {1}},
-//   {'a', {0}},
+//   {'w', {1}},
+  {'a', {0}},
 //   {'s', {1}},
   {'d', {0}},
 //   {'i', {3}},
@@ -133,7 +137,7 @@ int main(){
     uint8_t dxl_error = 0;                          // DYNAMIXEL err
 
     int32_t dxl_present_position = 0;  // Read 4 byte Position data
-    int32_t dxl_present_current = 0;  // Read 4 byte Position data
+    // int32_t dxl_present_current = 0;  // Read 4 byte Position data
     int32_t last_pos = 0;
 
     // Open port
@@ -157,6 +161,20 @@ int main(){
         getch();
         return 0;
     }
+    
+    // Set the DYNAMIXEL to extended position mode
+    for (int i = 1; i <= NUMB_OF_DYNAMIXELS; i++){
+        dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, i, OPERATING_MODE, EXTENDED_POSITION, &dxl_error);
+        if (dxl_comm_result != COMM_SUCCESS) {
+            printf("%s\n", packetHandler->getTxRxResult(dxl_comm_result));
+        }
+        else if (dxl_error != 0) {
+            printf("%s\n", packetHandler->getRxPacketError(dxl_error));
+        }
+        else {
+            printf("Succeeded enabling extended postion mode for servo ID %d \n", i);
+        }
+    }
 
     // Enable DYNAMIXEL Torque
     for (int i = 1; i <= NUMB_OF_DYNAMIXELS; i++){
@@ -171,6 +189,8 @@ int main(){
             printf("Succeeded enabling DYNAMIXEL Torque for servo ID %d \n", i);
         }
     }
+
+
 
     // For each servo, add its current position to the servo pose 
     for (int i = 1; i <= NUMB_OF_DYNAMIXELS; i++){
@@ -205,15 +225,15 @@ int main(){
             position_increment += .5 * speedBindings[key][0];
             printf("speed binding: %f \n", position_increment);
         }
-        // do nothing if an unbound key was pressed
-        else{
-            key = ' ';
-        }
-        // quit if ctll-C is pressed
-        if (key == '\x03')
+        // quit if escape is pressed
+        else if (key ==  ESC_ASCII_VALUE)
         {
             printf("\n\n                 .     .\n              .  |\\-^-/|  .    \n             /| } O.=.O { |\\\n\n                 CH3EERS\n\n");
             break;
+        }
+        // do nothing if an unbound key was pressed
+        else{
+            key = ' ';
         }
 
         // Write goal position

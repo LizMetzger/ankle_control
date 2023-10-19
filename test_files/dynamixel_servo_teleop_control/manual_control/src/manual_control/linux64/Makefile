@@ -26,7 +26,7 @@
 TARGET      = manual_control
 
 # important directories used by assorted rules and other variables
-DIR_DXL    = ../../../..
+DIR_DXL    = ../../..
 DIR_OBJS   = .objects
 
 # compiler options
@@ -42,7 +42,7 @@ FORMAT      = -m64
 # Core components (all of these are likely going to be needed)
 #---------------------------------------------------------------------
 INCLUDES   += -I$(DIR_DXL)/include/manual_control
-INCLUDES   += -I /home/liz/final_project/Ankle-Prosthetic-with-Dynamic-Impedance/dynamixel_servo_teleop_control/manual_control/include/manual_control
+INCLUDES   += -I /final_project/tiva/src/prosthetic_ankle/test_files/dynamixel_servo_teleop_control/manual_control/include/manual_control/
 LIBRARIES  += -ldxl_x64_cpp
 LIBRARIES  += -lrt
 #---------------------------------------------------------------------
