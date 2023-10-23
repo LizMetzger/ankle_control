@@ -100,6 +100,7 @@ CTRL-C to quit
 )";
 
 char key(' ');
+bool quit_program = false;
 int dxl_id = 0;
 int goal = 0;
 int temp_goal = 0;
@@ -269,8 +270,9 @@ int main()
         // quit if escape is pressed
         else if (key ==  ESC_ASCII_VALUE)
         {
-            printf("\n\n                 .     .\n              .  |\\-^-/|  .    \n             /| } O.=.O { |\\\n\n                 CH3EERS\n\n");
-            break;
+            goal = 0;
+            dxl_comm_result = packetHandler->write4ByteTxRx(portHandler, DXL_ID, ADDR_GOAL_POSITION, goal, &dxl_error);
+            quit_program = true;
         }
         // do nothing if an unbound key was pressed
         else{
@@ -286,8 +288,12 @@ int main()
                 printf("%s\n", packetHandler->getRxPacketError(dxl_error));
             }
 
-            printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal_pose), convert::tics2deg(dxl_present_position));
-        } while(dxl_present_position + 3 <= goal or dxl_present_position - 3 >= goal);
+            printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal), convert::tics2deg(dxl_present_position));
+        } while(dxl_present_position + 5 <= goal or dxl_present_position - 5 >= goal);
+        if (quit_program){
+            printf("\n\n                 .     .\n              .  |\\-^-/|  .    \n             /| } O.=.O { |\\\n\n                 CH3EERS\n\n");
+            break;
+        }
     }
 
   // Disable Dynamixel Torque
