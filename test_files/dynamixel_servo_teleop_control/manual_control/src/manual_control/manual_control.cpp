@@ -46,6 +46,7 @@
 #define ESC_ASCII_VALUE                 0x1b
 #define SPACE_ASCII_VALUE               0x20
 
+/// TODO: make it so that 0 is the first coil and that increasing moves it down
 #define NUMB_OF_DYNAMIXELS              1
 #define DXL_ID                          1
 #define MAX_ROT                         16380
