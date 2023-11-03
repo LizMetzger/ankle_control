@@ -15,6 +15,7 @@
 #include "inc/tm4c123gh6pm.h"
 #include "ankle_control/encoder.h"
 #include "ankle_control/force_sensor.h"
+#include "ankle_control/dynamixel_sdk/dynamixel_sdk.h"
 
 // #define FSR PIN('A',2)
 #define BUTTON PIN('A',3)
@@ -46,19 +47,19 @@ int main(void)
     // initialize vaiables
     const char data[] = "push \n";
     uint32_t FSR_val = 123;
+    char str[12];
 
     for(;;)
     {
+        // read force sensor data
         FSR_val = adc_read();
-        char str[12];
-        sprintf(str, "%lu \n", (unsigned long)FSR_val);
-        str[11] = '\0';
-        // const char val = FSR_val + '0';
-        // uart_write_block(port, &val, strlen(val), 0);
+        // write it to memory
+        adc_write(FSR_val, str, sizeof(str));
         if(pin_read(BUTTON))
         {
             led_set(LED_COLOR_GREEN);
             uart_write_block(port, &data, strlen(data), 0);
+            // print force sensor data
             uart_write_block(port, &str, strlen(str), 0);
             time_delay_ms(100);
         }

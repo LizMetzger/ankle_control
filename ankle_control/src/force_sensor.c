@@ -5,6 +5,8 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/adc.h"
+#include "driverlib/uart.h"
+#include "nuhal/uart_tiva.h"
 
 #define SEQ 3
 
@@ -45,7 +47,10 @@ uint32_t adc_read()
     return ulVoltage;
 }
 
-void adc_write()
+void adc_write(uint32_t data, char *str, size_t size)
 {
-
+    // Format the integer as a string and store it in the provided 'str' buffer.
+    snprintf(str, size, "%lu \n", (unsigned long)data);
+    str[size] = '\0';
+    return;
 }

@@ -105,6 +105,8 @@ int dxl_id = 0;
 int goal = 0;
 int temp_goal = 0;
 float goal_pose = 0.0;
+int count = 0;
+float last_pose = 0.0;
 
 // For non-blocking keyboard inputs
 int getch(void)
@@ -287,9 +289,18 @@ int main()
             else if (dxl_error != 0) {
                 printf("%s\n", packetHandler->getRxPacketError(dxl_error));
             }
+            // if bork comment this out
+            if (dxl_present_position != last_pose){
+              last_pose = dxl_present_position;
+              count = 0;
+            }
+            else{
+              count += 1;
+            }
 
             printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal), convert::tics2deg(dxl_present_position));
-        } while(dxl_present_position + 5 <= goal or dxl_present_position - 5 >= goal);
+        } while(dxl_present_position + 5 <= goal or dxl_present_position - 5 >= goal or count <= 10);
+
         if (quit_program){
             printf("\n\n                 .     .\n              .  |\\-^-/|  .    \n             /| } O.=.O { |\\\n\n                 CH3EERS\n\n");
             break;
