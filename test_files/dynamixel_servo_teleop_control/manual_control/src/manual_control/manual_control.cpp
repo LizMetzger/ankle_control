@@ -301,13 +301,11 @@ int main()
               count = 0;
             }
             else{
-              printf("count: %d", count);
               count += 1;
             }
 
             printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal), convert::tics2deg(dxl_present_position));
         } while(abs(dxl_present_position - goal) > MOVE_THRESH && count < 10);
-        printf("SET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         goal = dxl_present_position;
 
         if (quit_program){
