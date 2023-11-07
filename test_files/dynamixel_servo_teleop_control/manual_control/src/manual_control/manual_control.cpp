@@ -46,13 +46,13 @@
 #define ESC_ASCII_VALUE                 0x1b
 #define SPACE_ASCII_VALUE               0x20
 
-/// TODO: make it so that 0 is the first coil and that increasing moves it down
 #define NUMB_OF_DYNAMIXELS              1
 #define DXL_ID                          1
 #define MAX_ROT                         16380
 #define MIN_ROT                         0
 #define FULL_ROT                        4095
 #define HALF_ROT                        2048
+#define MOVE_THRESH                     100
 
 // initialize the amount to increment the position by in degrees
 float position_increment = 1.0;
@@ -261,6 +261,12 @@ int main()
             if (temp_goal <= MAX_ROT and temp_goal >= MIN_ROT){
                 goal = temp_goal;
             }
+            else if (temp_goal > MAX_ROT){
+                goal = MAX_ROT;
+            }
+            else if (temp_goal < MIN_ROT){
+                goal = MIN_ROT;
+            }
             // write goal position
             dxl_comm_result = packetHandler->write4ByteTxRx(portHandler, DXL_ID, ADDR_GOAL_POSITION, goal, &dxl_error);
         }
@@ -295,11 +301,14 @@ int main()
               count = 0;
             }
             else{
+              printf("count: %d", count);
               count += 1;
             }
 
             printf("[ID:%03d] Goal Position:%03f  Present Position:%03f\n", DXL_ID, convert::tics2deg(goal), convert::tics2deg(dxl_present_position));
-        } while(dxl_present_position + 5 <= goal or dxl_present_position - 5 >= goal or count <= 10);
+        } while(abs(dxl_present_position - goal) > MOVE_THRESH && count < 10);
+        printf("SET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        goal = dxl_present_position;
 
         if (quit_program){
             printf("\n\n                 .     .\n              .  |\\-^-/|  .    \n             /| } O.=.O { |\\\n\n                 CH3EERS\n\n");

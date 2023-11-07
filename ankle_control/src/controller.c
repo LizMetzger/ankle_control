@@ -17,7 +17,6 @@
 #include "ankle_control/force_sensor.h"
 #include "ankle_control/dynamixel_sdk/dynamixel_sdk.h"
 
-// #define FSR PIN('A',2)
 #define BUTTON PIN('A',3)
 
 static const struct pin_configuration pins[] =
