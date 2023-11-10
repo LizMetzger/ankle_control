@@ -64,7 +64,9 @@ int main(void)
         // write it to memory
         adc_write(FSR_val, FSR_str, sizeof(FSR_str));
 
-        
+        pos_val = encoder_pos();
+        // write it to memory
+        encoder_write(pos_val, pos_str, sizeof(pos_str));
 
         // read encoder position
         vel_val = encoder_vel();
@@ -85,9 +87,7 @@ int main(void)
             // uart_write_block(port, &vel_str, strlen(vel_str), 0);
             time_delay_ms(100);
             // read encoder position
-            pos_val = encoder_pos();
-            // write it to memory
-            encoder_write(pos_val, pos_str, sizeof(pos_str));
+            
             uart_write_block(port, &pos_str, strlen(pos_str), 0);
 
         }

@@ -16,7 +16,7 @@
 void encoder_enable()
 {
     // Set the value of the max number of pulses per revolution
-    uint32_t ui32_MAX_PULSES = 1024;
+    uint32_t ui32_MAX_PULSES = 4096;
 	uint32_t ui32_VEL_PERIOD = 32;
 
     // Enable GPIO Clock
@@ -36,7 +36,7 @@ void encoder_enable()
 	GPIOPinConfigure(GPIO_PD6_PHA0);
 	GPIOPinConfigure(GPIO_PD7_PHB0);
 
-    QEIConfigure(QEI0_BASE, (QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_NO_RESET |
+    QEIConfigure(QEI0_BASE, (QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_RESET_IDX |
 	QEI_CONFIG_CLOCK_DIR | QEI_CONFIG_NO_SWAP), ui32_MAX_PULSES);
 
 	QEIFilterEnable(QEI0_BASE);
