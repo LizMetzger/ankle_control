@@ -1,3 +1,5 @@
+#include <stdint.h>
+#include <stdbool.h> 
 #include "ankle_control/force_sensor.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -12,6 +14,7 @@
 
 uint32_t FRS_val;
 
+/// @brief enables reading data from the force sensor
 void adc_enable()
 {
     // enale clock to ADC0
@@ -31,6 +34,8 @@ void adc_enable()
     return;
 }
 
+/// @brief reads the data from the force sensor
+/// @return force scaled from 0-100
 uint32_t adc_read()
 {
     // start ADC conversion
@@ -47,6 +52,10 @@ uint32_t adc_read()
     return ulVoltage;
 }
 
+/// @brief used to write the data reading to screen
+/// @param data the read force from the fsr
+/// @param str the string to write the data to
+/// @param size the length of the string
 void adc_write(uint32_t data, char *str, size_t size)
 {
     // Format the integer as a string and store it in the provided 'str' buffer.

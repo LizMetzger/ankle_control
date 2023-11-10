@@ -10,6 +10,7 @@
 #include "nuhal/pin_tiva.h"
 #include "driverlib/uart.h"
 #include "driverlib/interrupt.h"
+#include "driverlib/qei.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "inc/tm4c123gh6pm.h"
@@ -38,6 +39,8 @@ int main(void)
     led_setup();
     // enable reading ADC from pin E3
     adc_enable();
+    // enable reading from qei for the encoder
+    encoder_enable();
 
     // open UART communication
     const struct uart_port * port =
@@ -46,21 +49,47 @@ int main(void)
     // initialize vaiables
     const char data[] = "push \n";
     uint32_t FSR_val = 123;
-    char str[12];
+    char FSR_str[12];
+
+    uint32_t pos_val = 123;
+    char pos_str[12];
+
+    uint32_t vel_val = 123;
+    char vel_str[12];
 
     for(;;)
     {
         // read force sensor data
         FSR_val = adc_read();
         // write it to memory
-        adc_write(FSR_val, str, sizeof(str));
+        adc_write(FSR_val, FSR_str, sizeof(FSR_str));
+
+        
+
+        // read encoder position
+        vel_val = encoder_vel();
+        // write it to memory
+        encoder_write(vel_val, vel_str, sizeof(vel_str));
+
+        //when the button is pushed
         if(pin_read(BUTTON))
         {
             led_set(LED_COLOR_GREEN);
-            uart_write_block(port, &data, strlen(data), 0);
+            // print test message
+            // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data
-            uart_write_block(port, &str, strlen(str), 0);
+            // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
+            // print encoder position
+            // uart_write_block(port, &pos_str, strlen(pos_str), 0);
+            // print encoder velocity
+            // uart_write_block(port, &vel_str, strlen(vel_str), 0);
             time_delay_ms(100);
+            // read encoder position
+            pos_val = encoder_pos();
+            // write it to memory
+            encoder_write(pos_val, pos_str, sizeof(pos_str));
+            uart_write_block(port, &pos_str, strlen(pos_str), 0);
+
         }
         else
         {
