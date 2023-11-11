@@ -73,10 +73,21 @@ int main(void)
         // write it to memory
         encoder_write(vel_val, vel_str, sizeof(vel_str));
 
+        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTINDEX)
+                {
+                // led_set(LED_COLOR_RED);
+                // Print a message to your console or serial output to indicate the index detection
+                // const char data[] = "push \n";
+                uart_write_block(port, &data, strlen(data), 0);
+                // Clear the interrupt flag
+                QEIIntClear(QEI0_BASE, QEI_INTINDEX);
+                // time_delay_ms(1000);
+                }
         //when the button is pushed
         if(pin_read(BUTTON))
         {
             led_set(LED_COLOR_GREEN);
+            
             // print test message
             // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data

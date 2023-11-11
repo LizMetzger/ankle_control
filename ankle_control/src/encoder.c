@@ -12,6 +12,7 @@
 #include "driverlib/uart.h"
 #include "nuhal/uart_tiva.h"
 
+
 /// @brief configures the Tiva to read data from the encoder via QEI
 void encoder_enable()
 {
@@ -48,6 +49,8 @@ void encoder_enable()
 	QEIVelocityConfigure(QEI0_BASE, QEI_VELDIV_1,  ui32_VEL_PERIOD);
 	//Enable the Velocity capture module
 	QEIVelocityEnable(QEI0_BASE);
+    // Enable interrupts 
+    QEIIntEnable(QEI0_BASE, QEI_INTINDEX);
     return;
 }
 
@@ -63,7 +66,7 @@ uint32_t encoder_pos(){
 /// @return the velocity of the joint
 uint32_t encoder_vel(){
     // read number of pulses per time period
-    QEIVelocityGet(QEI0_BASE);
+    // QEIVelocityGet(QEI0_BASE);
     return QEIVelocityGet(QEI0_BASE);
 }
 
@@ -78,6 +81,12 @@ void encoder_write(uint32_t data, char *str, size_t size)
     str[size] = '\0';
     return;
 }
+
+// void check_idx(){
+//     const struct uart_port * port =
+//         uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
+    
+// }
 // /// @brief reset the zero position of the ankle
 // void home(){
 //     return;
