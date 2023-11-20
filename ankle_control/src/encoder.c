@@ -11,46 +11,40 @@
 #include "driverlib/qei.h"
 #include "driverlib/uart.h"
 #include "nuhal/uart_tiva.h"
+#include "nuhal/pin_tiva.h"
+#include "nuhal/tiva.h"
+#include "nuhal/utilities.h"
 
+/// pin definitions for the led
+const struct pin_configuration qei_pin_table[] =
+{
+    {GPIO_PD6_PHA0, PIN_QEI},
+    {GPIO_PD7_PHB0, PIN_QEI},
+};
 
 /// @brief configures the Tiva to read data from the encoder via QEI
 void encoder_enable()
 {
+	// SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
     // Set the value of the max number of pulses per revolution
-    uint32_t ui32_MAX_PULSES = 4096;
+    uint32_t ui32_MAX_PULSES = 8192;
 	uint32_t ui32_VEL_PERIOD = 32;
 
-    // Enable GPIO Clock
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
-	// this loop waits for the peripheral to be ready (3 clock cycles)
-	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOD)){}
+	 // Enable GPIO Clock
+	pin_setup(qei_pin_table, ARRAY_LEN(qei_pin_table));
+	tiva_peripheral_enable(SYSCTL_PERIPH_QEI0);
 
-    // Enable QEI0 clock
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_QEI0);
-	// this loop waits for the peripheral to be ready
-	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_QEI0)){}
-
-    //Configure GPIO pins to act as QEI pins
-	//GPIO PD3 -> IDX0, PD6 -> PhA0, PD7 -> PhB0
-	GPIOPinTypeQEI(GPIO_PORTD_BASE, GPIO_PIN_7|GPIO_PIN_6|GPIO_PIN_3);
-	GPIOPinConfigure(GPIO_PD3_IDX0);
-	GPIOPinConfigure(GPIO_PD6_PHA0);
-	GPIOPinConfigure(GPIO_PD7_PHB0);
-
-    QEIConfigure(QEI0_BASE, (QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_RESET_IDX |
-	QEI_CONFIG_CLOCK_DIR | QEI_CONFIG_NO_SWAP), ui32_MAX_PULSES);
+	QEIDisable(QEI0_BASE);
+	QEIIntDisable(QEI0_BASE, QEI_INTERROR | QEI_INTDIR | QEI_INTTIMER | QEI_INTINDEX);
+	QEIConfigure(QEI0_BASE, QEI_CONFIG_CAPTURE_A_B | QEI_CONFIG_RESET_IDX |
+	QEI_CONFIG_QUADRATURE| QEI_CONFIG_NO_SWAP, ui32_MAX_PULSES);
 
 	QEIFilterEnable(QEI0_BASE);
-	//Enables the QEI module
+	// Enables the QEI module
 	QEIEnable(QEI0_BASE);
-	//Configure the velocity capture module
-	//QEI_VELDIV_1: no predivision
-	//ui32_VEL_PERIOD: number of clock ticks over which to count pulses
-	QEIVelocityConfigure(QEI0_BASE, QEI_VELDIV_1,  ui32_VEL_PERIOD);
-	//Enable the Velocity capture module
-	QEIVelocityEnable(QEI0_BASE);
     // Enable interrupts 
-    QEIIntEnable(QEI0_BASE, QEI_INTINDEX);
+    QEIIntEnable(QEI0_BASE, QEI_INTDIR | QEI_INTINDEX);
+	IntMasterEnable();
     return;
 }
 
@@ -58,15 +52,13 @@ void encoder_enable()
 /// @return the position according to the encoder
 uint32_t encoder_pos(){
     // read encoder position
-    // QEIPositionGet(QEI0_BASE);
     return QEIPositionGet(QEI0_BASE);
-}   
+}
 
 /// @brief function o get the velcoity that the ankle is rotatin
 /// @return the velocity of the joint
 uint32_t encoder_vel(){
     // read number of pulses per time period
-    // QEIVelocityGet(QEI0_BASE);
     return QEIVelocityGet(QEI0_BASE);
 }
 
@@ -77,7 +69,7 @@ uint32_t encoder_vel(){
 void encoder_write(uint32_t data, char *str, size_t size)
 {
     // Format the integer as a string and store it in the provided 'str' buffer.
-    snprintf(str, size, "%lu \n", (unsigned long)data);
+    snprintf(str, size, "%ld \n", (long)data);
     str[size] = '\0';
     return;
 }

@@ -14,7 +14,7 @@ target_include_directories(ankle_control INTERFACE
 
 target_sources(ankle_control INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/encoder.c>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/force_sensor.c>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/servo.c>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/force_sensor.c>
 )
 

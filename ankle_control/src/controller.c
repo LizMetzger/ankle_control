@@ -57,6 +57,9 @@ int main(void)
     uint32_t vel_val = 123;
     char vel_str[12];
 
+    uint32_t dir = 0;
+    char dir_str[12];
+
     for(;;)
     {
         // read force sensor data
@@ -73,21 +76,36 @@ int main(void)
         // write it to memory
         encoder_write(vel_val, vel_str, sizeof(vel_str));
 
-        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTINDEX)
+
+        dir = QEIDirectionGet(QEI0_BASE);
+        if (dir<0){
+            dir = 0;
+        }
+        encoder_write(dir, dir_str, sizeof(dir_str));
+        
+        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTDIR)
                 {
-                // led_set(LED_COLOR_RED);
-                // Print a message to your console or serial output to indicate the index detection
-                // const char data[] = "push \n";
-                uart_write_block(port, &data, strlen(data), 0);
-                // Clear the interrupt flag
-                QEIIntClear(QEI0_BASE, QEI_INTINDEX);
-                // time_delay_ms(1000);
+                led_set(LED_COLOR_YELLOW);
+                QEIIntClear(QEI0_BASE, QEI_INTDIR);
+                time_delay_ms(1000);
                 }
+        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTINDEX)
+            {
+            led_set(LED_COLOR_WHITE);
+            QEIIntClear(QEI0_BASE, QEI_INTINDEX);
+            time_delay_ms(1000);
+            }
+        uart_write_block(port, &pos_str, strlen(pos_str), 0);
+        // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
+        time_delay_ms(100);
         //when the button is pushed
         if(pin_read(BUTTON))
-        {
+        {   
+            // #ifdef PART_TM4C123GH6PM
             led_set(LED_COLOR_GREEN);
-            
+            // #else
+            // led_set(LED_COLOR_YELLOW);
+            // #endif
             // print test message
             // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data
@@ -98,8 +116,8 @@ int main(void)
             // uart_write_block(port, &vel_str, strlen(vel_str), 0);
             time_delay_ms(100);
             // read encoder position
-            
-            uart_write_block(port, &pos_str, strlen(pos_str), 0);
+            uart_write_block(port, &dir_str, strlen(dir_str), 0);
+            // uart_write_block(port, &pos_str, strlen(pos_str), 0);
 
         }
         else
