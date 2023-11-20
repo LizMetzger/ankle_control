@@ -9,6 +9,6 @@ void TxOnRxOff();
 
 void sendPos();
 
-void getPod();
+void getPos();
 
 #endif

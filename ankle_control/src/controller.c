@@ -15,6 +15,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/tm4c123gh6pm.h"
 #include "ankle_control/encoder.h"
+#include "ankle_control/servo.h"
 #include "ankle_control/force_sensor.h"
 #include "ankle_control/dynamixel_sdk/dynamixel_sdk.h"
 
@@ -22,14 +23,14 @@
 
 static const struct pin_configuration pins[] =
 {
-    // sensor peripherals
-    // {FSR, PIN_INPUT},
+    // button
     {BUTTON, PIN_INPUT},
-    // servo
     // uart pins
     {GPIO_PA0_U0RX,  PIN_UART},
     {GPIO_PA1_U0TX, PIN_UART}
 };
+
+int count = 0;
 
 /// \brief Flash the leds infinitely
 int main(void)
@@ -41,6 +42,7 @@ int main(void)
     adc_enable();
     // enable reading from qei for the encoder
     encoder_enable();
+    enable_servo();
 
     // open UART communication
     const struct uart_port * port =
@@ -76,31 +78,20 @@ int main(void)
         // write it to memory
         encoder_write(vel_val, vel_str, sizeof(vel_str));
 
-
-        dir = QEIDirectionGet(QEI0_BASE);
-        if (dir<0){
-            dir = 0;
-        }
-        encoder_write(dir, dir_str, sizeof(dir_str));
-        
-        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTDIR)
-                {
-                led_set(LED_COLOR_YELLOW);
-                QEIIntClear(QEI0_BASE, QEI_INTDIR);
-                time_delay_ms(1000);
-                }
-        if(QEIIntStatus(QEI0_BASE, true) & QEI_INTINDEX)
-            {
-            led_set(LED_COLOR_WHITE);
-            QEIIntClear(QEI0_BASE, QEI_INTINDEX);
-            time_delay_ms(1000);
-            }
         uart_write_block(port, &pos_str, strlen(pos_str), 0);
         // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
         //when the button is pushed
         if(pin_read(BUTTON))
         {   
+            if (count == 0){
+                TxOnRxOff();
+                count ++;
+            }
+            else{
+                count = 0;
+                TxOffRxOn();
+            }
             // #ifdef PART_TM4C123GH6PM
             led_set(LED_COLOR_GREEN);
             // #else
@@ -115,10 +106,6 @@ int main(void)
             // print encoder velocity
             // uart_write_block(port, &vel_str, strlen(vel_str), 0);
             time_delay_ms(100);
-            // read encoder position
-            uart_write_block(port, &dir_str, strlen(dir_str), 0);
-            // uart_write_block(port, &pos_str, strlen(pos_str), 0);
-
         }
         else
         {

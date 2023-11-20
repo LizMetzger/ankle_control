@@ -15,7 +15,7 @@
 #include "nuhal/tiva.h"
 #include "nuhal/utilities.h"
 
-/// pin definitions for the led
+/// pin definitions for the encoder
 const struct pin_configuration qei_pin_table[] =
 {
     {GPIO_PD6_PHA0, PIN_QEI},
