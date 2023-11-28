@@ -1,5 +1,6 @@
 #include <stdint.h>
-#include <stdbool.h> 
+#include <stdbool.h>
+#include <stdio.h>
 #include "ankle_control/force_sensor.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"

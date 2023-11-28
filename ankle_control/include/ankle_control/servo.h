@@ -7,8 +7,8 @@ void TxOffRxOn();
 
 void TxOnRxOff();
 
-void sendPos();
+void writeServo();
 
-void getPos();
+void readServo();
 
 #endif

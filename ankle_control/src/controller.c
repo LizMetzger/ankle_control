@@ -43,6 +43,7 @@ int main(void)
     // enable reading from qei for the encoder
     encoder_enable();
     enable_servo();
+    IntMasterEnable();
 
     // open UART communication
     const struct uart_port * port =
@@ -81,6 +82,13 @@ int main(void)
         uart_write_block(port, &pos_str, strlen(pos_str), 0);
         // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
+
+        if(UARTIntStatus(UART4_BASE, true) & UART_INT_RX){
+            led_set(LED_COLOR_RED);
+            UARTIntClear(UART4_BASE, UART_INT_RX);
+            time_delay_ms(100);
+        }
+
         //when the button is pushed
         if(pin_read(BUTTON))
         {   

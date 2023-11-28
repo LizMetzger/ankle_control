@@ -1,5 +1,6 @@
 #include <stdint.h>
-#include <stdbool.h> 
+#include <stdbool.h>
+#include <stdio.h>
 #include "ankle_control/encoder.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -44,7 +45,6 @@ void encoder_enable()
 	QEIEnable(QEI0_BASE);
     // Enable interrupts 
     QEIIntEnable(QEI0_BASE, QEI_INTDIR | QEI_INTINDEX);
-	IntMasterEnable();
     return;
 }
 
