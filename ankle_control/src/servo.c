@@ -191,10 +191,16 @@ void writeByteServo(unsigned char byte){
 
 void toggleServoLED(){
     TxOnRxOff();
-    unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01};
-    unsigned short CRC = update_crc('0', packet, 11);
-    uint8_t CRCL = (uint8_t)(CRC & 0xFF);
-    uint8_t CRCH = (uint8_t)((CRC >> 8) & 0xFF);
+    // unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01};
+    // unsigned short CRC = update_crc('0', packet, 11);
+    // uint8_t CRCL = (uint8_t)(CRC & 0xFF);
+    // uint8_t CRCH = (uint8_t)((CRC >> 8) & 0xFF);
+    uint8_t CRCL;
+    uint8_t CRCH;
+    unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x41, 0x00, 0x01, CRCL, CRCH};
+    unsigned short CRC = update_crc(0, packet, 11);
+    CRCL = (CRC & 0xFF);
+    CRCH = ((CRC >> 8) & 0xFF);
     writeByteServo(H1);
     writeByteServo(H2);
     writeByteServo(H3);
@@ -239,10 +245,13 @@ void torqueEnablePacket(){
     // uart_write_block(port, &CRC2, 1, 0);
     // while (UARTSpaceAvail(BASE) == 0){};
     // for each field in the packet get a byte and write it
-    unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01};
-    unsigned short CRC = update_crc('0', packet, 11);
-    uint8_t CRCL = (uint8_t)(CRC & 0xFF);
-    uint8_t CRCH = (uint8_t)((CRC >> 8) & 0xFF);
+    // unsigned char packet2[] = {H1, H2, H3, RSRV, ID, 0x09, 0x00, 0x03, 0x74, 0x00, 0x00, 0x02, 0x00, 0x00, CRCL, CRCH};
+    uint8_t CRCL;
+    uint8_t CRCH;
+    unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01, CRCL, CRCH};
+    unsigned short CRC = update_crc(0, packet, 11);
+    CRCL = (CRC & 0xFF);
+    CRCH = ((CRC >> 8) & 0xFF);
     writeByteServo(H1);
     writeByteServo(H2);
     writeByteServo(H3);
@@ -269,19 +278,9 @@ void writePosPacket(){
     uint8_t CRCH;
     unsigned char packet2[] = {H1, H2, H3, RSRV, ID, 0x09, 0x00, 0x03, 0x74, 0x00, 0x00, 0x02, 0x00, 0x00, CRCL, CRCH};
     unsigned short CRC = update_crc(0, packet2, 14);
-    // unsigned char TxPacket[] = {0xFF, 0xFF, 0xFD, 0x00, 0x01, 0x07, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, CRCL, CRCH};
-    // unsigned short CRC = update_crc(0, TxPacket, 12);
     CRCL = (CRC & 0x00FF);
     CRCH = ((CRC >> 8) & 0x00FF);
-    const struct uart_port * port =
-        uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
-    char crcl_str[50];
-    // snprintf(crcl_str, 50, "CRC: 0x%02X\n", CRC);
 
-    snprintf(crcl_str, 50, "CRCL: 0x%02X\nCRCH: 0x%02X\n", CRCL, CRCH);
-    crcl_str[49] = '\0';
-
-    uart_write_block(port, crcl_str, strlen(crcl_str), 0);
     // uart_write_block(port, &H1, 1, 0);
     // uart_write_block(port, &H2, 1, 0);
     // uart_write_block(port, &H3, 1, 0);
