@@ -50,7 +50,7 @@ int main(void)
         uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
 
     // initialize vaiables
-    const char data[] = "push \n";
+    const char data[] = "test \n";
     uint32_t FSR_val = 123;
     char FSR_str[12];
 
@@ -79,7 +79,7 @@ int main(void)
         // write it to memory
         encoder_write(vel_val, vel_str, sizeof(vel_str));
 
-        uart_write_block(port, &pos_str, strlen(pos_str), 0);
+        // uart_write_block(port, &pos_str, strlen(pos_str), 0);
         // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
 
@@ -92,19 +92,17 @@ int main(void)
         //when the button is pushed
         if(pin_read(BUTTON))
         {   
-            if (count == 0){
-                TxOnRxOff();
-                count ++;
-            }
-            else{
-                count = 0;
-                TxOffRxOn();
-            }
-            // #ifdef PART_TM4C123GH6PM
+            // if (count == 0){
+            //     TxOnRxOff();
+            //     count ++;
+            // }
+            // else{
+            //     count = 0;
+            //     TxOffRxOn();
+            // }
             led_set(LED_COLOR_GREEN);
-            // #else
-            // led_set(LED_COLOR_YELLOW);
-            // #endif
+            toggleServoLED();
+            writePosPacket();
             // print test message
             // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data
@@ -114,6 +112,7 @@ int main(void)
             // print encoder velocity
             // uart_write_block(port, &vel_str, strlen(vel_str), 0);
             time_delay_ms(100);
+            // TxOnRxOff();
         }
         else
         {

@@ -74,12 +74,7 @@ void encoder_write(uint32_t data, char *str, size_t size)
     return;
 }
 
-// void check_idx(){
-//     const struct uart_port * port =
-//         uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
-    
-// }
-// /// @brief reset the zero position of the ankle
+///TODO: /// @brief reset the zero position of the ankle
 // void home(){
 //     return;
 // }

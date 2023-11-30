@@ -3,6 +3,6 @@
 
 int main(int argc, char *argv[])
 {
-    dummy_func();
+    encoder_enable();
     return 0;
 }

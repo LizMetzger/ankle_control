@@ -3,11 +3,19 @@
 
 void enable_servo();
 
+void torqueEnablePacket();
+
 void TxOffRxOn();
 
 void TxOnRxOff();
 
-void writeServo();
+void writeByteServo(unsigned char byte);
+
+void writeIntServo(int data);
+
+void toggleServoLED();
+
+void writePosPacket();
 
 void readServo();
 
