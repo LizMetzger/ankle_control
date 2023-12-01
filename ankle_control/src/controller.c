@@ -42,7 +42,9 @@ int main(void)
     adc_enable();
     // enable reading from qei for the encoder
     encoder_enable();
+    // enable UART communication with the servo
     enable_servo();
+    
     IntMasterEnable();
 
     // open UART communication
@@ -59,9 +61,6 @@ int main(void)
 
     uint32_t vel_val = 123;
     char vel_str[12];
-
-    uint32_t dir = 0;
-    char dir_str[12];
 
     for(;;)
     {
@@ -103,6 +102,12 @@ int main(void)
             led_set(LED_COLOR_GREEN);
             toggleServoLED();
             writePosPacket();
+            // int count = 0;
+            // while (count < 9000){
+            //     readPosPacket();
+            //     count += 1;
+            // }
+            
             // print test message
             // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data

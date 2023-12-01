@@ -39,13 +39,6 @@ unsigned short P4 = 0x02;
 unsigned short CRC1 = 0xCA;
 unsigned short CRC2 = 0x89;
 
-
-// create port stuct
-// list of the ports that can be opened
-// static const struct uart_port ports[] = {
-//     {UART4_BASE, SYSCTL_PERIPH_UART4, INT_UART4}
-// };
-
 /// pin definitions for the servo
 const struct pin_configuration servo_pin_table[] =
 {
@@ -103,19 +96,6 @@ unsigned short update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr,
     return crc_accum;
 }
 
-
-// void UART4_Transmitter(char data)  
-// {
-//     while((UART4->FR & 0x20) != 0); /* wait until Tx buffer not full */
-//     UART4->DR = data;                  /* before giving it another byte */
-// }
-
-// // function to write to the servo
-// void write_packet(uint16_t id, uint16_t address, uint16_t *data, uint16_t length){
-//     // uart4_port.base = UART4_BASE;
-//     UART5_Transmitter(*UART4_BASE, H1, sizeof(H1));
-// }
-
 /// @brief  enable the UART communication and configure it for the servo
 void enable_servo()
 {
@@ -145,10 +125,10 @@ void enable_servo()
     UARTEnable(BASE);
     // enable UART interrupts for reading
     UARTIntEnable(BASE, UART_INT_RX);
-    // enable Tx, disable Rx
-    TxOffRxOn();
     // enable torque on the servo
     torqueEnablePacket();
+    // enable Tx, disable Rx
+    TxOffRxOn();
     return;
 }
 
@@ -166,20 +146,27 @@ void TxOnRxOff(){
     return;
 }
 
-void UARTIntHandler(void){
-    uint32_t ui32Status;
-    // Get the interrrupt status.
-    ui32Status = UARTIntStatus(BASE, true);
-    // Clear the asserted interrupts.
-    UARTIntClear(BASE, ui32Status);
-    // Loop while there are characters in the receive FIFO.
-    while(UARTCharsAvail(BASE))
-    {
-        // Read the next character from the UART and write it back to the UART.
-        UARTCharPutNonBlocking(BASE,
-                                   UARTCharGetNonBlocking(BASE));
-    }
-}
+// void UARTIntHandler(void){
+//     const struct uart_port * port =
+//        uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
+//     char crcl_str[50];
+//    // snprintf(crcl_str, 50, "CRC: 0x%02X\n", CRC);
+//     char getChar;
+//     uint32_t ui32Status;
+//     // Get the interrrupt status.
+//     ui32Status = UARTIntStatus(BASE, true);
+//     // Clear the asserted interrupts.
+//     UARTIntClear(BASE, ui32Status);
+//     // Loop while there are characters in the receive FIFO.
+//     while(UARTCharsAvail(BASE))
+//     {
+//         // Read the next character from the UART and write it back to the UART.
+//         getChar = UARTCharGetNonBlocking(BASE);
+//         snprintf(crcl_str, 50, "CRCL: 0x%02X\nCRCH: 0x%02X\n", getChar);
+//         crcl_str[49] = '\0';
+//         uart_write_block(port, crcl_str, strlen(crcl_str), 0);
+//     }
+// }
 
 void writeByteServo(unsigned char byte){
     // wait for there to be space to write
@@ -190,17 +177,17 @@ void writeByteServo(unsigned char byte){
 }
 
 void toggleServoLED(){
+    // turn Tx on
     TxOnRxOff();
-    // unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01};
-    // unsigned short CRC = update_crc('0', packet, 11);
-    // uint8_t CRCL = (uint8_t)(CRC & 0xFF);
-    // uint8_t CRCH = (uint8_t)((CRC >> 8) & 0xFF);
+    // Calculate CRCL and CRCH with dynamixel CRC code
     uint8_t CRCL;
     uint8_t CRCH;
     unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x41, 0x00, 0x01, CRCL, CRCH};
-    unsigned short CRC = update_crc(0, packet, 11);
-    CRCL = (CRC & 0xFF);
-    CRCH = ((CRC >> 8) & 0xFF);
+    size_t packet_length = sizeof(packet) / sizeof(packet[0]);
+    unsigned short CRC = update_crc(0, packet, packet_length - 2);
+    CRCL = (CRC & 0x00FF);
+    CRCH = ((CRC >> 8) & 0x00FF);
+    // write bytes to the servo
     writeByteServo(H1);
     writeByteServo(H2);
     writeByteServo(H3);
@@ -213,7 +200,7 @@ void toggleServoLED(){
     writeByteServo(0x00); // P2
     writeByteServo(0x01); // P3
     writeByteServo(CRCL);
-    UARTIntDisable(BASE, UART_INT_RX);
+    UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     writeByteServo(CRCH);
     while (UARTSpaceAvail(BASE) == 0){};
     TxOffRxOn();
@@ -223,35 +210,12 @@ void toggleServoLED(){
 
 void torqueEnablePacket(){
     TxOnRxOff();
-    // const struct uart_port * port =
-    //     uart_open("4", 115200, UART_FLOW_NONE, UART_PARITY_NONE);
-    // const char data[] = "test \n";
-    // uart_write_block(port, &H1, 1, 0);
-    // uart_write_block(port, &H2, 1, 0);
-    // uart_write_block(port, &H3, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &ID, 1, 0);
-    // uart_write_block(port, &LEN1, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &MODE, 1, 0);
-    // uart_write_block(port, &P1, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &P4, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &CRC1, 1, 0);
-    // UARTIntDisable(BASE, UART_INT_RX);
-    // uart_write_block(port, &CRC2, 1, 0);
-    // while (UARTSpaceAvail(BASE) == 0){};
-    // for each field in the packet get a byte and write it
-    // unsigned char packet2[] = {H1, H2, H3, RSRV, ID, 0x09, 0x00, 0x03, 0x74, 0x00, 0x00, 0x02, 0x00, 0x00, CRCL, CRCH};
     uint8_t CRCL;
     uint8_t CRCH;
     unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01, CRCL, CRCH};
     unsigned short CRC = update_crc(0, packet, 11);
-    CRCL = (CRC & 0xFF);
-    CRCH = ((CRC >> 8) & 0xFF);
+    CRCL = (CRC & 0x00FF);
+    CRCH = ((CRC >> 8) & 0x00FF);
     writeByteServo(H1);
     writeByteServo(H2);
     writeByteServo(H3);
@@ -280,25 +244,6 @@ void writePosPacket(){
     unsigned short CRC = update_crc(0, packet2, 14);
     CRCL = (CRC & 0x00FF);
     CRCH = ((CRC >> 8) & 0x00FF);
-
-    // uart_write_block(port, &H1, 1, 0);
-    // uart_write_block(port, &H2, 1, 0);
-    // uart_write_block(port, &H3, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &ID, 1, 0);
-    // uart_write_block(port, &LEN1, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &MODE, 1, 0);
-    // uart_write_block(port, &P1, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &P4, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &RSRV, 1, 0);
-    // uart_write_block(port, &CRC1, 1, 0);
-    // UARTIntDisable(BASE, UART_INT_RX);
-    // uart_write_block(port, &CRC2, 1, 0);
-    // while (UARTSpaceAvail(BASE) == 0){};
     // for each field in the packet get a byte and write it
     writeByteServo(H1);
     writeByteServo(H2);
@@ -314,9 +259,39 @@ void writePosPacket(){
     writeByteServo(0x02);
     writeByteServo(0x00);
     writeByteServo(0x00);
-    writeByteServo(0xCA);
+    writeByteServo(CRCL);
     UARTIntDisable(BASE, UART_INT_RX);
-    writeByteServo(0x89);
+    writeByteServo(CRCH);
+    while (UARTSpaceAvail(BASE) == 0){};
+    TxOffRxOn();
+    UARTIntEnable(BASE, UART_INT_RX);
+    return;
+}
+
+void readPosPacket(){
+    TxOnRxOff();
+    uint8_t CRCL;
+    uint8_t CRCH;
+    unsigned char packet2[] = {H1, H2, H3, RSRV, ID, 0x07, 0x00, 0x02, 0x84, 0x00, 0x04, 0x00, CRCL, CRCH};
+    unsigned short CRC = update_crc(0, packet2, 12);
+    CRCL = (CRC & 0x00FF);
+    CRCH = ((CRC >> 8) & 0x00FF);
+    // for each field in the packet get a byte and write it
+    writeByteServo(H1);
+    writeByteServo(H2);
+    writeByteServo(H3);
+    writeByteServo(RSRV);
+    writeByteServo(ID);
+    writeByteServo(0x07);
+    writeByteServo(0x00);
+    writeByteServo(0x02);
+    writeByteServo(0x84);
+    writeByteServo(0x00);
+    writeByteServo(0x04);
+    writeByteServo(0x00);
+    writeByteServo(CRCL);
+    UARTIntDisable(BASE, UART_INT_RX);
+    writeByteServo(CRCH);
     while (UARTSpaceAvail(BASE) == 0){};
     TxOffRxOn();
     UARTIntEnable(BASE, UART_INT_RX);

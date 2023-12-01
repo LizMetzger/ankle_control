@@ -17,6 +17,8 @@ void toggleServoLED();
 
 void writePosPacket();
 
+void readPosPacket();
+
 void readServo();
 
 #endif
