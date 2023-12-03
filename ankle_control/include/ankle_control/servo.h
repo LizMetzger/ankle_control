@@ -13,6 +13,8 @@ void writeByteServo(unsigned char byte);
 
 void writeIntServo(int data);
 
+void UARTIntHandler();
+
 void toggleServoLED();
 
 void writePosPacket();
