@@ -191,13 +191,6 @@ void toggleServoLED(){
     // set these packet values
     packet[packet_length - 2] = CRCL;
     packet[packet_length - 1] = CRCH;
-    // print the CRC
-    const struct uart_port * port =
-    uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
-    char crcl_str[50];
-    snprintf(crcl_str, 50, "CRCL: 0x%02X\nCRCH: 0x%02X\n", CRCL, CRCH);
-    crcl_str[49] = '\0';
-    uart_write_block(port, crcl_str, strlen(crcl_str), 0);
     // write each packet member to the servo
     for (size_t i = 0; i < packet_length; i++) {
         writeByteServo(packet[i]);
@@ -218,27 +211,43 @@ void torqueEnablePacket(){
     uint8_t CRCL;
     uint8_t CRCH;
     unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01, CRCL, CRCH};
+    size_t packet_length = sizeof(packet) / sizeof(packet[0]);
     unsigned short CRC = update_crc(0, packet, 11);
     CRCL = (CRC & 0x00FF);
     CRCH = ((CRC >> 8) & 0x00FF);
-    writeByteServo(H1);
-    writeByteServo(H2);
-    writeByteServo(H3);
-    writeByteServo(RSRV);
-    writeByteServo(ID);
-    writeByteServo(0x06); // length 1 (length = 3 + numb of params)
-    writeByteServo(0x00); // length 2
-    writeByteServo(0x03); // instruction
-    writeByteServo(0x40); // P1
-    writeByteServo(0x00); // P2
-    writeByteServo(0x01); // P3
-    writeByteServo(CRCL);
-    UARTIntDisable(BASE, UART_INT_RX);
-    writeByteServo(CRCH);
+    // set these packet values
+    packet[packet_length - 2] = CRCL;
+    packet[packet_length - 1] = CRCH;
+    // write each packet member to the servo
+    for (size_t i = 0; i < packet_length; i++) {
+        writeByteServo(packet[i]);
+    }
+    // disable interrupts
+    UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
     time_delay_ms(500);
+    // turn Tx off and Rx on
     TxOffRxOn();
+    // enable interrupts
     UARTIntEnable(BASE, UART_INT_RX);
+    // writeByteServo(H1);
+    // writeByteServo(H2);
+    // writeByteServo(H3);
+    // writeByteServo(RSRV);
+    // writeByteServo(ID);
+    // writeByteServo(0x06); // length 1 (length = 3 + numb of params)
+    // writeByteServo(0x00); // length 2
+    // writeByteServo(0x03); // instruction
+    // writeByteServo(0x40); // P1
+    // writeByteServo(0x00); // P2
+    // writeByteServo(0x01); // P3
+    // writeByteServo(CRCL);
+    // UARTIntDisable(BASE, UART_INT_RX);
+    // writeByteServo(CRCH);
+    // while (UARTSpaceAvail(BASE) == 0){};
+    // time_delay_ms(500);
+    // TxOffRxOn();
+    // UARTIntEnable(BASE, UART_INT_RX);
     return;
 }
 
@@ -246,32 +255,48 @@ void writePosPacket(){
     TxOnRxOff();
     uint8_t CRCL;
     uint8_t CRCH;
-    unsigned char packet2[] = {H1, H2, H3, RSRV, ID, 0x09, 0x00, 0x03, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, CRCL, CRCH};
-    unsigned short CRC = update_crc(0, packet2, 14);
+    unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x09, 0x00, 0x03, 0x74, 0x00, 0x00, 0x02, 0x00, 0x00, CRCL, CRCH};
+    size_t packet_length = sizeof(packet) / sizeof(packet[0]);
+    unsigned short CRC = update_crc(0, packet, 14);
     CRCL = (CRC & 0x00FF);
     CRCH = ((CRC >> 8) & 0x00FF);
-    // for each field in the packet get a byte and write it
-    writeByteServo(H1);
-    writeByteServo(H2);
-    writeByteServo(H3);
-    writeByteServo(RSRV);
-    writeByteServo(ID);
-    writeByteServo(0x09);
-    writeByteServo(0x00);
-    writeByteServo(0x03);
-    writeByteServo(0x74);
-    writeByteServo(0x00);
-    writeByteServo(0x00);
-    writeByteServo(0x00);
-    writeByteServo(0x00);
-    writeByteServo(0x00);
-    writeByteServo(CRCL);
-    UARTIntDisable(BASE, UART_INT_RX);
-    writeByteServo(CRCH);
+    // set these packet values
+    packet[packet_length - 2] = CRCL;
+    packet[packet_length - 1] = CRCH;
+    // write each packet member to the servo
+    for (size_t i = 0; i < packet_length; i++) {
+        writeByteServo(packet[i]);
+    }
+    // disable interrupts
+    UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
     time_delay_ms(500);
+    // turn Tx off and Rx on
     TxOffRxOn();
+    // enable interrupts
     UARTIntEnable(BASE, UART_INT_RX);
+    // // for each field in the packet get a byte and write it
+    // writeByteServo(H1);
+    // writeByteServo(H2);
+    // writeByteServo(H3);
+    // writeByteServo(RSRV);
+    // writeByteServo(ID);
+    // writeByteServo(0x09);
+    // writeByteServo(0x00);
+    // writeByteServo(0x03);
+    // writeByteServo(0x74);
+    // writeByteServo(0x00);
+    // writeByteServo(0x00);
+    // writeByteServo(0x00);
+    // writeByteServo(0x00);
+    // writeByteServo(0x00);
+    // writeByteServo(CRCL);
+    // UARTIntDisable(BASE, UART_INT_RX);
+    // writeByteServo(CRCH);
+    // while (UARTSpaceAvail(BASE) == 0){};
+    // time_delay_ms(500);
+    // TxOffRxOn();
+    // UARTIntEnable(BASE, UART_INT_RX);
     return;
 }
 

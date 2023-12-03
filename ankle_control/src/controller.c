@@ -100,9 +100,9 @@ int main(void)
             //     TxOffRxOn();
             // }
             led_set(LED_COLOR_GREEN);
-            toggleServoLED();
-            // torqueEnablePacket();
-            // writePosPacket();
+            // toggleServoLED();
+            torqueEnablePacket();
+            writePosPacket();
             // int count = 0;
             // while (count < 9000){
             //     readPosPacket();
