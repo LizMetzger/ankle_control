@@ -26,6 +26,9 @@
 #define baud 115200
 // set the servo parity
 #define parity UART_CONFIG_PAR_NONE
+
+#define DELAY 100
+
 // set packet values
 unsigned short H1 = 0xFF;
 unsigned short H2 = 0xFF;
@@ -208,7 +211,7 @@ void toggleServoLED(){
     // disable interrupts
     UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
-    time_delay_ms(500);
+    time_delay_ms(DELAY);
     // turn Tx off and Rx on
     TxOffRxOn();
     // enable interrupts
@@ -235,7 +238,7 @@ void torqueEnablePacket(){
     // disable interrupts
     UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
-    time_delay_ms(500);
+    time_delay_ms(DELAY);
     // turn Tx off and Rx on
     TxOffRxOn();
     // enable interrupts
@@ -266,7 +269,7 @@ void writePosPacket(int pos){
     // disable interrupts
     UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
-    time_delay_ms(500);
+    time_delay_ms(DELAY);
     // free the memory used to get the postion in hex
     free(position_hex);
     // turn Tx off and Rx on
@@ -304,7 +307,7 @@ void readPosPacket(){
     // disable interrupts
     UARTIntDisable(BASE, UART_INT_RX); //  interrupt here may cause a delay longer than the return delay time 
     while (UARTSpaceAvail(BASE) == 0){};
-    time_delay_ms(500);
+    time_delay_ms(DELAY);
     // turn Tx off and Rx on
     TxOffRxOn();
     // enable interrupts
