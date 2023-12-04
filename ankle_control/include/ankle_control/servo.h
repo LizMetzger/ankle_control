@@ -11,16 +11,12 @@ void TxOnRxOff();
 
 void writeByteServo(unsigned char byte);
 
-void writeIntServo(int data);
-
 void UARTIntHandler();
 
 void toggleServoLED();
 
-void writePosPacket();
+void writePosPacket(int pos);
 
 void readPosPacket();
-
-void readServo();
 
 #endif

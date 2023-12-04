@@ -44,7 +44,6 @@ int main(void)
     encoder_enable();
     // enable UART communication with the servo
     enable_servo();
-    
     IntMasterEnable();
 
     // open UART communication
@@ -91,24 +90,11 @@ int main(void)
         //when the button is pushed
         if(pin_read(BUTTON))
         {   
-            // if (count == 0){
-            //     TxOnRxOff();
-            //     count ++;
-            // }
-            // else{
-            //     count = 0;
-            //     TxOffRxOn();
-            // }
             led_set(LED_COLOR_GREEN);
             // toggleServoLED();
             torqueEnablePacket();
             writePosPacket();
-            // int count = 0;
-            // while (count < 9000){
-            //     readPosPacket();
-            //     count += 1;
-            // }
-            
+            // readPosPacket();
             // print test message
             // uart_write_block(port, &data, strlen(data), 0);
             // print force sensor data
