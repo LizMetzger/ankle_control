@@ -32,12 +32,6 @@ unsigned short H2 = 0xFF;
 unsigned short H3 = 0xFD;
 unsigned short RSRV = 0x00;
 unsigned short ID = 0x01;
-unsigned short LEN1 = 0x09;
-unsigned short MODE = 0x03;
-unsigned short P1 = 0x74;
-unsigned short P4 = 0x02;
-unsigned short CRC1 = 0xCA;
-unsigned short CRC2 = 0x89;
 
 /// pin definitions for the servo
 const struct pin_configuration servo_pin_table[] =
@@ -113,6 +107,14 @@ uint8_t* intToHex(int num){
     return hexBytes;
 }
 
+void writeByteServo(unsigned char byte){
+    // wait for there to be space to write
+    while (UARTSpaceAvail(BASE) == 0) {};
+    // write the byte
+    UARTCharPut(BASE, byte);
+    return;
+}
+
 /// @brief  enable the UART communication and configure it for the servo
 void enable_servo()
 {
@@ -183,14 +185,6 @@ void TxOnRxOff(){
 //         uart_write_block(port, crcl_str, strlen(crcl_str), 0);
 //     }
 // }
-
-void writeByteServo(unsigned char byte){
-    // wait for there to be space to write
-    while (UARTSpaceAvail(BASE) == 0) {};
-    // write the byte
-    UARTCharPut(BASE, byte);
-    return;
-}
 
 void toggleServoLED(){
     // turn Tx on
