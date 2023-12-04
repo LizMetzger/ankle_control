@@ -20,6 +20,9 @@
 #include "ankle_control/dynamixel_sdk/dynamixel_sdk.h"
 
 #define BUTTON PIN('A',3)
+#define STEP_VAL 25
+#define HIGH_GOAL 1000
+#define LOW_GOAL 0
 
 static const struct pin_configuration pins[] =
 {
@@ -45,6 +48,8 @@ int main(void)
     // enable UART communication with the servo
     enable_servo();
     IntMasterEnable();
+
+    int goal_pos = HIGH_GOAL;
 
     // open UART communication
     const struct uart_port * port =
@@ -78,7 +83,7 @@ int main(void)
         encoder_write(vel_val, vel_str, sizeof(vel_str));
 
         // uart_write_block(port, &pos_str, strlen(pos_str), 0);
-        // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
+        uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
 
         if(UARTIntStatus(UART4_BASE, true) & UART_INT_RX){
@@ -87,6 +92,21 @@ int main(void)
             time_delay_ms(100);
         }
 
+        if (FSR_val > STEP_VAL){
+            int count = 0;
+            while (count < 5){
+                torqueEnablePacket();
+                writePosPacket(goal_pos);
+                count++;
+            }
+            if (goal_pos == HIGH_GOAL){
+                goal_pos = LOW_GOAL;
+            }
+            else{
+                goal_pos = HIGH_GOAL;
+            }
+        }
+        FSR_val = adc_read();
         //when the button is pushed
         if(pin_read(BUTTON))
         {   
