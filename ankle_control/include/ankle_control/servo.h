@@ -7,8 +7,6 @@ void TxOffRxOn();
 
 void TxOnRxOff();
 
-void UARTIntHandler();
-
 void toggleServoLED();
 
 void torqueEnablePacket();

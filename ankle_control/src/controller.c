@@ -49,6 +49,11 @@ int main(void)
     enable_servo();
     IntMasterEnable();
 
+    // make sure torque gets enabled
+    for (int i = 0; i < 15; i++){
+        torqueEnablePacket();
+    }
+
     int goal_pos = HIGH_GOAL;
 
     // open UART communication
@@ -86,17 +91,16 @@ int main(void)
         uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
 
-        if(UARTIntStatus(UART4_BASE, true) & UART_INT_RX){
-            led_set(LED_COLOR_RED);
-            UARTIntClear(UART4_BASE, UART_INT_RX);
-            time_delay_ms(100);
-        }
+        // if(UARTIntStatus(UART4_BASE, true) & UART_INT_RX){
+        //     led_set(LED_COLOR_RED);
+        //     UARTIntClear(UART4_BASE, UART_INT_RX);
+            // time_delay_ms(100);
+        // }
 
         if (FSR_val > STEP_VAL){
             int count = 0;
             while (count < 5){
-                torqueEnablePacket();
-                writePosPacket(goal_pos);
+            writePosPacket(goal_pos);
                 count++;
             }
             if (goal_pos == HIGH_GOAL){
@@ -108,28 +112,28 @@ int main(void)
         }
         FSR_val = adc_read();
         //when the button is pushed
-        if(pin_read(BUTTON))
-        {   
-            led_set(LED_COLOR_GREEN);
-            // toggleServoLED();
-            torqueEnablePacket();
-            writePosPacket();
-            // readPosPacket();
-            // print test message
-            // uart_write_block(port, &data, strlen(data), 0);
-            // print force sensor data
-            // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
-            // print encoder position
-            // uart_write_block(port, &pos_str, strlen(pos_str), 0);
-            // print encoder velocity
-            // uart_write_block(port, &vel_str, strlen(vel_str), 0);
-            time_delay_ms(100);
-            // TxOnRxOff();
-        }
-        else
-        {
-            led_set(LED_COLOR_BLUE);
-        }
+        // if(pin_read(BUTTON))
+        // {   
+        //     led_set(LED_COLOR_GREEN);
+        //     toggleServoLED();
+        //     // torqueEnablePacket();
+        //     // writePosPacket();
+        //     // readPosPacket();
+        //     // print test message
+        //     // uart_write_block(port, &data, strlen(data), 0);
+        //     // print force sensor data
+        //     // uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
+        //     // print encoder position
+        //     // uart_write_block(port, &pos_str, strlen(pos_str), 0);
+        //     // print encoder velocity
+        //     // uart_write_block(port, &vel_str, strlen(vel_str), 0);
+        //     time_delay_ms(100);
+        //     // TxOnRxOff();
+        // }
+        // else
+        // {
+        //     led_set(LED_COLOR_BLUE);
+        // }
     }
     return 0;
 }

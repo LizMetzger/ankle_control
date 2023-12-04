@@ -23,11 +23,13 @@
 #define BASE UART4_BASE
 
 // set the servo baud rate
-#define baud 115200
+#define baud 57600
+// #define std_delay 
+
 // set the servo parity
 #define parity UART_CONFIG_PAR_NONE
 
-#define DELAY 100
+#define DELAY (10000000/baud)
 
 // set packet values
 unsigned short H1 = 0xFF;
@@ -155,7 +157,6 @@ void enable_servo()
 void TxOffRxOn(){
     pin_write(RXCONTROL, 1);
     pin_write(TXCONTROL, 0);
-    time_delay_ms(10);
     return;
 }
 
@@ -163,36 +164,13 @@ void TxOffRxOn(){
 void TxOnRxOff(){
     pin_write(TXCONTROL, 1);
     pin_write(RXCONTROL, 0);
-    // time_delay_ms(10);
     return;
 }
 
-// void UARTIntHandler(){
-//     const struct uart_port * port =
-//        uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
-//     char crcl_str[50];
-//    // snprintf(crcl_str, 50, "CRC: 0x%02X\n", CRC);
-//     char getChar;
-//     uint32_t ui32Status;
-//     // Get the interrrupt status.
-//     // ui32Status = UARTIntStatus(BASE, true);
-//     // Clear the asserted interrupts.
-//     // UARTIntClear(BASE, ui32Status);
-//     // Loop while there are characters in the receive FIFO.
-//     while(UARTCharsAvail(BASE))
-//     {
-//         // Read the next character from the UART and write it back to the UART.
-//         getChar = UARTCharGetNonBlocking(BASE);
-//         snprintf(crcl_str, 50, "CRCL: 0x%02X\nCRCH: 0x%02X\n", getChar);
-//         crcl_str[49] = '\0';
-//         uart_write_block(port, crcl_str, strlen(crcl_str), 0);
-//     }
-// }
-
+/// @brief call this function to turn the built in LED on the servo on
 void toggleServoLED(){
     // turn Tx on
     TxOnRxOff();
-    // time_delay_ms(500);
     // Calculate CRCL and CRCH with dynamixel CRC code
     uint8_t CRCL;
     uint8_t CRCH;
@@ -220,7 +198,9 @@ void toggleServoLED(){
 }
 
 void torqueEnablePacket(){
+    // turn on transmit
     TxOnRxOff();
+    // build the packet
     uint8_t CRCL;
     uint8_t CRCH;
     unsigned char packet[] = {H1, H2, H3, RSRV, ID, 0x06, 0x00, 0x03, 0x40, 0x00, 0x01, CRCL, CRCH};
@@ -288,8 +268,8 @@ void readPosPacket(){
     unsigned short CRC = update_crc(0, packet, packet_length);
     CRCL = 0x1D;
     CRCH = 0x15;
-    // CRCL = (CRC & 0x00FF);
-    // CRCH = ((CRC >> 8) & 0x00FF);
+    CRCL = (CRC & 0x00FF);
+    CRCH = ((CRC >> 8) & 0x00FF);
     const struct uart_port * port =
        uart_open("0", 1000000, UART_FLOW_NONE, UART_PARITY_NONE);
     char crcl_str[50];
