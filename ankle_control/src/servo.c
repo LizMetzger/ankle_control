@@ -38,7 +38,7 @@ unsigned short H3 = 0xFD;
 unsigned short RSRV = 0x00;
 unsigned short ID = 0x01;
 
-/// pin definitions for the servo
+// pin definitions for the servo
 const struct pin_configuration servo_pin_table[] =
 {
     {GPIO_PC4_U4RX, PIN_UART},
@@ -47,7 +47,11 @@ const struct pin_configuration servo_pin_table[] =
     {TXCONTROL, PIN_OUTPUT}
 };
 
-// dynamixel function to figure ou what the CRC is
+/// @brief dynamixel function to figure ou what the CRC is
+/// @param crc_accum is set to be 0
+/// @param data_blk_ptr the packet
+/// @param data_blk_size  size of the packet excluding CRCL and CRCH
+/// @return the values of the CRC, needs to be split later into CRCL and CRCH
 unsigned short update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, unsigned short data_blk_size)
 {
     unsigned short i, j;
@@ -95,6 +99,9 @@ unsigned short update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr,
     return crc_accum;
 }
 
+/// @brief convert an integer number into hex values that can be built into a packet
+/// @param num the integer to convert
+/// @return the address of a list of hex values
 uint8_t* intToHex(int num){
     size_t numBytes = sizeof(int);
     uint8_t* hexBytes = (uint8_t*)malloc(numBytes);
@@ -112,6 +119,8 @@ uint8_t* intToHex(int num){
     return hexBytes;
 }
 
+/// @brief take a byte and write it over UART to the servo
+/// @param byte the byte to be wwritten to the servo
 void writeByteServo(unsigned char byte){
     // wait for there to be space to write
     while (UARTSpaceAvail(BASE) == 0) {};
@@ -197,6 +206,7 @@ void toggleServoLED(){
     return;
 }
 
+/// @brief call this to enable the torque of a dynamixel servo
 void torqueEnablePacket(){
     // turn on transmit
     TxOnRxOff();
@@ -226,6 +236,8 @@ void torqueEnablePacket(){
     return;
 }
 
+/// @brief write a goal position to a servo
+/// @param pos the desired postion of the servo
 void writePosPacket(int pos){
     // turn on transmit
     TxOnRxOff();
@@ -259,6 +271,7 @@ void writePosPacket(int pos){
     return;
 }
 
+/// @brief read the current position of the servo
 void readPosPacket(){
     TxOnRxOff();
     uint8_t CRCL;

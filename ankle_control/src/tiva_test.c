@@ -1,4 +1,4 @@
-/// \file
+/// \file used this files to make sure that the TIVA board was working correctly
 /// \brief Display Led's RED, GREEN, BLUE, WHITE, each for one second
 /// Designed for use with the EK-TM4C123GXL board
 #include "string.h"

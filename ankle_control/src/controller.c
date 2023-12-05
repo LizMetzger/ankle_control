@@ -1,4 +1,6 @@
-/// \file
+/// \file this file is a basic control loop for the dynamic impedence prosthetic ankle
+// it detects when the foot of the user is off the ground and will set the spring to a 
+// predetermined stiffness
 #include "string.h"
 #include "nuhal/error.h"
 #include "nuhal/tiva.h"
@@ -17,10 +19,9 @@
 #include "ankle_control/encoder.h"
 #include "ankle_control/servo.h"
 #include "ankle_control/force_sensor.h"
-#include "ankle_control/dynamixel_sdk/dynamixel_sdk.h"
 
 #define BUTTON PIN('A',3)
-#define STEP_VAL 25
+#define STEP_VAL 15
 #define HIGH_GOAL 8000
 #define LOW_GOAL 4000
 
@@ -34,6 +35,7 @@ static const struct pin_configuration pins[] =
 };
 
 int count = 0;
+bool diff_step = true;
 
 /// \brief Flash the leds infinitely
 int main(void)
@@ -91,24 +93,25 @@ int main(void)
         uart_write_block(port, &FSR_str, strlen(FSR_str), 0);
         time_delay_ms(100);
 
-        // if(UARTIntStatus(UART4_BASE, true) & UART_INT_RX){
-        //     led_set(LED_COLOR_RED);
-        //     UARTIntClear(UART4_BASE, UART_INT_RX);
-            // time_delay_ms(100);
-        // }
-
-        if (FSR_val > STEP_VAL){
+        // check if foot is off the ground
+        if (FSR_val < STEP_VAL && diff_step){
             int count = 0;
+            diff_step = false;
             while (count < 5){
-            writePosPacket(goal_pos);
+                // move the servo
+                writePosPacket(goal_pos);
                 count++;
             }
+            // switch goal position
             if (goal_pos == HIGH_GOAL){
                 goal_pos = LOW_GOAL;
             }
             else{
                 goal_pos = HIGH_GOAL;
             }
+        }
+        else if (FSR_val > STEP_VAL && !diff_step){
+            diff_step = true;
         }
         FSR_val = adc_read();
         //when the button is pushed
