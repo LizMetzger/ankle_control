@@ -23,7 +23,7 @@
 #define BUTTON PIN('A',3)
 #define STEP_VAL 15
 #define HIGH_GOAL 8000
-#define LOW_GOAL 4000
+#define LOW_GOAL 2000
 
 static const struct pin_configuration pins[] =
 {

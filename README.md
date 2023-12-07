@@ -13,7 +13,6 @@ This section of the package is responsible for controlling the ankle assembly.
 - `tiva_test.c`: An auxiliary file that contains a function to test if a Tiva board is working correctly. When this code is written to the board, the LED should start blue and turn red when a button is pushed.
 - `exec_test.c`: An auxiliary file to test if the `CMakeLists.txt` is compiling correctly. If errors are thrown regarding this file, it indicates issues with the CMake process.
 
-To set up a Tiva C Launchpad to run this code, you can follow these instructions (you will need access to the omnid repository):
 
 To set up a Tiva C Launchpad to run this code you can follow these instructions (you will need access to the omnid repository):
 ```bash
@@ -71,3 +70,5 @@ from here you should be able to use 'Q' and 'E' on the keyboard for full turns o
 6. Install GCC toolchain `sudo apt install  gcc-arm-none-eabi libnewlib-arm-none-eabi gdb-multiarch`
 8. Install the following TI tool to /opt directory: https://www.ti.com/tool/ARM-CGT
 9. Follow the “Flashing the Firmware” or the “Template Mode” sections to flash the LED example
+
+If you are continuing this project see [this link](https://docs.google.com/document/d/1PWttoiP_I-D5uhp3z9gbeUz3KAqcI5_J4W16wc22g_Q/edit?usp=sharing) for a list of further improvements as well as a bunch of information on choices that were made and details of the project.
